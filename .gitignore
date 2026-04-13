@@ -1,0 +1,39 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Test / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Streamlit / local runtime artifacts
+.streamlit/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Local data artifacts (keep folder structure, ignore generated files)
+data/index/
+data/crawl/
+data/embeddings/
+data/*.db
+data/*.sqlite*
+

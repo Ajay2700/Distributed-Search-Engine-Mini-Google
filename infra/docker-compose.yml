@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  # ── Search Engine API ─────────────────────────────────────────
+  search-api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - SEARCH_DATA_DIR=/data
+      - REDIS_URL=redis://redis:6379/0
+      - USE_REDIS=true
+      - INDEX_SHARDS=4
+      - CRAWLER_THREADS=8
+      - API_PORT=8000
+    volumes:
+      - search-data:/data
+    depends_on:
+      - redis
+      - kafka
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Redis (Adaptive Cache) ────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lfu
+    restart: unless-stopped
+
+  # ── Kafka (Message Queue) ─────────────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
+
+volumes:
+  search-data:
+  redis-data:
