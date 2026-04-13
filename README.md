@@ -2,6 +2,10 @@
 
 A scalable search engine demonstrating distributed systems, information retrieval, and system design principles. Built from scratch without Elasticsearch or Solr.
 
+<img width="1902" height="947" alt="1" src="https://github.com/user-attachments/assets/2ceb4b92-a51b-4a8b-af84-ccb8d534986d" />
+
+
+
 ## Architecture
 
 ```
